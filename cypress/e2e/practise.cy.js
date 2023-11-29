@@ -47,7 +47,7 @@ describe("practising testing", () => {
 
         //focus the message
         cy.get("[data-cy='contact-input-message']").as("inputMessage").focus().blur().parent().should((el) => {
-            expect(el).to.have.attr("class").contains("invalid")
+            expect(el).to.have.attr("class").contains("valid")
         })
 
         //focus the name
@@ -55,6 +55,8 @@ describe("practising testing", () => {
             expect(el).to.have.attr("invalid")
         })
         //focus the email
+
+        //d
 
 
     })
