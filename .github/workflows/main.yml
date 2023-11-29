@@ -51,12 +51,6 @@ jobs:
         with:
           path: ~/cypress
           name: cypress-artifact
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy
-        run: echo "Deployed Website"
     
       
       
