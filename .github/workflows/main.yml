@@ -1,0 +1,62 @@
+name: E2E
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-modules-${{ hashFiles("**/package-lock.json") }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Upload Artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: public/build
+          name: build-artifact
+      - name: Fail Report Artifact
+        if: failure() && steps.upload-artifact.outcome == "failure"
+        run: echo "Failed to upload artifact"
+  test:
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+      - name: Run E2E
+        run: npx cypress run
+      - name: Upload Cypress Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: ~/cypress
+          name: cypress-artifact
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: echo "Deployed Website"
+    
+      
+      
